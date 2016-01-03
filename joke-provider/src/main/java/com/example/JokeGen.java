@@ -1,9 +1,10 @@
 package com.example;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class JokeGen {
+
+    // taken from http://thoughtcatalog.com/christopher-hudspeth/2013/09/50-terrible-quick-jokes-thatll-get-you-a-laugh-on-demand/
     private static String[] jokes = {
             "It's hard to explain puns to kleptomaniacs because they always take things literally.",
             "I used to think the brain was the most important organ. Then I thought, look what's telling me that.",
