@@ -54,15 +54,15 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void tellJoke(View view){
-        new EndpointsAsyncTask().execute(new Pair <Context, String> (this, "Andrei"));
+        new EndpointsAsyncTask().execute(this);
     }
 
-    private class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+    private class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
         private MyApi myApiService = null;
         private Context context;
 
         @Override
-        protected String doInBackground(Pair<Context, String>... params) {
+        protected String doInBackground(Context... params) {
             if(myApiService == null) {  // Only do this once
                 MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                         .setRootUrl("https://baikal-1139.appspot.com/_ah/api/");
@@ -71,7 +71,7 @@ public class MainActivity extends ActionBarActivity {
                 myApiService = builder.build();
             }
 
-            context = params[0].first;
+            context = params[0];
             try {
                 String data =  myApiService.getJoke().execute().getData();
 
