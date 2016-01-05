@@ -1,28 +1,16 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.example.JokeGen;
 import com.example.barbarossa.jokedisplay.DisplayActivity;
-import com.example.barbarossa.myapplication.backend.myApi.MyApi;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
-
-import java.io.IOException;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements JokeDownloader.IListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,41 +42,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void tellJoke(View view){
-        new EndpointsAsyncTask().execute(this);
+        JokeDownloader jd = new JokeDownloader(this);
+        jd.download();
     }
 
-    private class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
-        private MyApi myApiService = null;
-        private Context context;
+    public void onDownloadCompleted(String result) {
+        Intent jokeIntent = new Intent(this, DisplayActivity.class);
+        jokeIntent.putExtra(DisplayActivity.JOKE_EXTRA, result);
 
-        @Override
-        protected String doInBackground(Context... params) {
-            if(myApiService == null) {  // Only do this once
-                MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
-                        .setRootUrl("https://baikal-1139.appspot.com/_ah/api/");
-
-                // end options for devappserver
-                myApiService = builder.build();
-            }
-
-            context = params[0];
-            try {
-                String data =  myApiService.getJoke().execute().getData();
-
-                return data;
-
-            } catch (IOException e) {
-                return e.getMessage();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Intent jokeIntent = new Intent(MainActivity.this, DisplayActivity.class);
-            jokeIntent.putExtra(DisplayActivity.JOKE_EXTRA, result);
-
-            MainActivity.this.startActivity(jokeIntent);
-        }
+        startActivity(jokeIntent);
     }
-
 }
