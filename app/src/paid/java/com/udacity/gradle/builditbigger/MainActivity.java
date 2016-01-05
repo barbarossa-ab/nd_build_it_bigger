@@ -6,16 +6,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.barbarossa.jokedisplay.DisplayActivity;
 
 
 public class MainActivity extends ActionBarActivity implements JokeDownloader.IListener{
+    private ProgressBar spinner;
+    private boolean jokeDownloading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        spinner = (ProgressBar)findViewById(R.id.progressBar);
+        spinner.setVisibility(View.GONE);
     }
 
 
@@ -42,11 +48,19 @@ public class MainActivity extends ActionBarActivity implements JokeDownloader.IL
     }
 
     public void tellJoke(View view){
-        JokeDownloader jd = new JokeDownloader(this);
-        jd.download();
+        if (!jokeDownloading) {
+            jokeDownloading = true;
+            JokeDownloader jd = new JokeDownloader(this);
+            jd.download();
+
+            spinner.setVisibility(View.VISIBLE);
+        }
     }
 
     public void onDownloadCompleted(String result) {
+        spinner.setVisibility(View.GONE);
+        jokeDownloading = false;
+
         Intent jokeIntent = new Intent(this, DisplayActivity.class);
         jokeIntent.putExtra(DisplayActivity.JOKE_EXTRA, result);
 

@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.barbarossa.jokedisplay.DisplayActivity;
 import com.google.android.gms.ads.AdListener;
@@ -16,14 +17,19 @@ import com.google.android.gms.ads.InterstitialAd;
 public class MainActivity extends ActionBarActivity implements JokeDownloader.IListener{
     InterstitialAd mInterstitialAd;
 
-    private volatile boolean adDisplayed;
-    private volatile boolean jokeDownloading;
+    private boolean adDisplayed;
+    private boolean jokeDownloading;
     private String mJoke;
+
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        spinner = (ProgressBar)findViewById(R.id.progressBar);
+        spinner.setVisibility(View.GONE);
 
         adDisplayed = false;
         jokeDownloading = false;
@@ -74,6 +80,7 @@ public class MainActivity extends ActionBarActivity implements JokeDownloader.IL
             jokeDownloading = true;
             JokeDownloader jd = new JokeDownloader(this);
             jd.download();
+            spinner.setVisibility(View.VISIBLE);
         }
 
         if (mInterstitialAd.isLoaded()) {
@@ -85,6 +92,7 @@ public class MainActivity extends ActionBarActivity implements JokeDownloader.IL
     public void onDownloadCompleted(String result) {
         mJoke = result;
         jokeDownloading = false;
+        spinner.setVisibility(View.GONE);
 
         if(!adDisplayed) {
             displayJoke();
